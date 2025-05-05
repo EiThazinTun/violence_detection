@@ -12,7 +12,7 @@ def detect_violence_in_frame(frame):
     found_violence = False
     detected_objects = []
 
-    # Handle both single or list results
+    # Handle single or list results
     if isinstance(results, list):
         result = results[0]
     else:
@@ -28,15 +28,15 @@ def detect_violence_in_frame(frame):
             if conf > 0.3:
                 x1, y1, x2, y2 = map(int, box.tolist())
 
-                # Check if the label is violent
+                # Check if label is violent
                 if label in ["knife", "gun", "weapon", "fight"]:
                     detected_objects.append(label.capitalize())
                     found_violence = True
                 elif label == "person":
                     detected_objects.append("Person")
-                    found_violence = True  # Optional: treat presence of people as violence indicator
+                    found_violence = True  # Optional: mark people as a concern
 
-                # Draw the bounding box and label
+                # Draw box
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
                 cv2.putText(frame, f"{label} {conf:.2f}", (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
@@ -45,5 +45,4 @@ def detect_violence_in_frame(frame):
 
 def analyze_with_ollama(prompt):
     response = ollama.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
-    print(response)
     return response.get("message", {}).get("content", "Ollama response doesn't contain expected text.")
